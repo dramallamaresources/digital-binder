@@ -1,0 +1,561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2299.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Digital Binder Manager&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: 'Inter', sans-serif; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.binder-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.edit-button { transition: background-color 0.15s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.edit-button:hover { @apply bg-blue-600; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.section-item { cursor: pointer; transition: background-color 0.15s; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.section-item:hover { @apply bg-gray-100; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.active-section { @apply border-l-4 border-blue-500 bg-blue-50; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body class="bg-gray-50 min-h-screen"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Main Container --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="app-container" class="container mx-auto p-4 md:p-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h1 class="text-4xl font-extrabold text-gray-800 mb-8 text-center"&gt;Digital Binder Manager&lt;/h1&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="loading-spinner" class="text-center py-20 text-gray-500 hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"&gt;&lt;/circle&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"&gt;&lt;/path&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="mt-2"&gt;Loading...&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- The main UI will be rendered here --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="main-ui" class="hidden"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Custom Modal for Alerts/Confirmations --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="custom-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 id="modal-title" class="text-xl font-bold text-gray-800 mb-4"&gt;Confirm Action&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p id="modal-message" class="text-gray-600 mb-6"&gt;Are you sure you want to proceed?&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex justify-end space-x-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button id="modal-cancel-btn" class="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition"&gt;Cancel&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button id="modal-confirm-btn" class="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition"&gt;Confirm&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Firebase Imports --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script type="module"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>import { getFirestore, doc, onSnapshot, setDoc, arrayUnion, arrayRemove, runTransaction, collection, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Enable Firestore Debug Logging</p>
+<p class="p1"><span class="Apple-converted-space">        </span>setLogLevel('Debug');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- GLOBAL CONFIG &amp; INITIALIZATION ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// NOTE: The variables __app_id, __firebase_config, and __initial_auth_token are provided by the canvas environment.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// If running this file outside the canvas, you will need to replace them with real Firebase credentials</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// and an authentication method if you want to connect to a specific, permanent database.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let app, db, auth, userId = null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let isAdmin = false; // Flag to determine if the user is the admin (i.e., authenticated via custom token)</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let binderData = { binderTitle: "My Digital Binder", sections: [] };</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let currentSectionId = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const ui = {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>loadingSpinner: document.getElementById('loading-spinner'),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>mainUI: document.getElementById('main-ui'),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>modal: document.getElementById('custom-modal'),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>modalTitle: document.getElementById('modal-title'),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>modalMessage: document.getElementById('modal-message'),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>modalConfirmBtn: document.getElementById('modal-confirm-btn'),</p>
+<p class="p1"><span class="Apple-converted-space">            </span>modalCancelBtn: document.getElementById('modal-cancel-btn'),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const BINDER_DOC_ID = 'main';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- UTILITY FUNCTIONS ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/**</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* Determines the Firestore path for the public-facing binder data.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* The data is public so viewers can read it, but it is keyed by the admin's UID.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* @param {string} uid The admin's unique ID.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* @returns {object} The Document Reference object.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const getBinderDocRef = (uid) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const bindersCollection = collection(db, 'artifacts', appId, 'public', 'data', 'binders');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return doc(bindersCollection, uid);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- AUTH &amp; INITIALIZATION ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const initializeFirebase = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>app = initializeApp(firebaseConfig);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>db = getFirestore(app);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>auth = getAuth(app);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Start with loading</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.loadingSpinner.classList.remove('hidden');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 1. Try to sign in the Admin using the custom token</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (initialAuthToken) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>await signInWithCustomToken(auth, initialAuthToken);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log('Admin signed in with custom token.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// 2. If no custom token, sign in anonymously (Public Viewer or un-privileged Admin)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>await signInAnonymously(auth);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log('Signed in anonymously.');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// 3. Set up the Auth State Listener</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onAuthStateChanged(auth, (user) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (user) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>userId = user.uid;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Check if the current user ID matches the token-authenticated user ID</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// This assumes only the user with the initialAuthToken should have edit rights</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (user.uid === (auth.currentUser?.uid || initialAuthToken)) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>isAdmin = !!initialAuthToken; // If we have a token, they are the admin</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>isAdmin = false;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>console.log(`User ID: ${userId}, Is Admin: ${isAdmin}`);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Determine the view and start listening to data</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const params = new URLSearchParams(window.location.search);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const viewMode = params.get('view');</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const targetAdminUid = params.get('uid');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>if (viewMode === 'public' &amp;&amp; targetAdminUid) {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// Public View Mode: use the UID from the URL parameter</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>startDataListener(targetAdminUid, 'public');</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>// Admin View Mode (or fallback)</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>startDataListener(userId, 'admin');</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// User logged out/error</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>userId = null;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>ui.loadingSpinner.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>ui.mainUI.innerHTML = '&lt;p class="text-center text-red-500"&gt;Could not initialize application. Please ensure Firebase configuration is valid.&lt;/p&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>ui.mainUI.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error("Firebase Initialization Error:", error);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.loadingSpinner.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.mainUI.innerHTML = `&lt;p class="text-center text-red-500"&gt;Initialization failed: ${error.message}&lt;/p&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.mainUI.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- FIRESTORE DATA LISTENER ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/**</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* Starts the real-time listener for the binder data.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* @param {string} targetUid The UID of the admin whose binder we are reading.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>* @param {string} mode 'admin' or 'public'</p>
+<p class="p1"><span class="Apple-converted-space">         </span>*/</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const startDataListener = (targetUid, mode) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const docRef = getBinderDocRef(targetUid);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const unsubscribe = onSnapshot(docRef, (docSnap) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (docSnap.exists()) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>binderData = docSnap.data();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (!binderData.sections || !Array.isArray(binderData.sections)) {</p>
+<p class="p1"><span class="Apple-converted-space">                         </span>binderData.sections = []; // Ensure sections is an array</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log("Binder Data Updated:", binderData);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>console.log("No existing binder data. Initializing a new one.");</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>// Initialize a default binder structure if it's the admin</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (mode === 'admin') {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>binderData = {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>binderTitle: "My Digital Binder",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>sections: [{</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>id: crypto.randomUUID(),</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>title: "Welcome Section",</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>content: marked.parse("# Welcome to Your Digital Binder\n\nUse the panel to the left to edit, add, and reorder sections. This content is written in **Markdown**!")</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>saveBinderData(); // Save the initial state</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>// Public view but no data found</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>binderData = {</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>binderTitle: "Binder Not Found",</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>sections: [{</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>id: 'error',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>title: 'Error',</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>content: 'This binder link is invalid or the content has not been set yet.'</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>};</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// If no section is selected, default to the first one</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (!currentSectionId &amp;&amp; binderData.sections.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentSectionId = binderData.sections[0].id;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderUI(mode, targetUid);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, (error) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error("Firestore Listener Error:", error);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderError(`Failed to load binder data: ${error.message}`);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Clean up the listener on page unload (optional but good practice)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.addEventListener('beforeunload', unsubscribe);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- DATA MANIPULATION ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const saveBinderData = async (newBinderData = binderData) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">             </span>if (!isAdmin) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.warn("Attempted to save data without admin privileges.");</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const docRef = getBinderDocRef(userId);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>await setDoc(docRef, newBinderData, { merge: true });</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.log("Binder data saved successfully.");</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error("Error saving binder data:", error);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderError(`Failed to save data: ${error.message}`);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const updateSectionContent = (sectionId, content) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isAdmin) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sectionIndex = binderData.sections.findIndex(s =&gt; s.id === sectionId);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (sectionIndex !== -1) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>binderData.sections[sectionIndex].content = content;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>saveBinderData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const addSection = (title = "New Section") =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isAdmin) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const newSection = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>id: crypto.randomUUID(),</p>
+<p class="p1"><span class="Apple-converted-space">                </span>title: title,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>content: marked.parse("## Start Writing Here\n\nUse **Markdown** to format your document content.")</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p1"><span class="Apple-converted-space">            </span>binderData.sections.push(newSection);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentSectionId = newSection.id;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>saveBinderData();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const deleteSection = async (sectionId) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isAdmin) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const confirmed = await showModal('Delete Section', 'Are you sure you want to permanently delete this section? This cannot be undone.');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (confirmed) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>binderData.sections = binderData.sections.filter(s =&gt; s.id !== sectionId);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// If the deleted section was the active one, select the first available section</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (currentSectionId === sectionId) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>currentSectionId = binderData.sections.length &gt; 0 ? binderData.sections[0].id : null;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>saveBinderData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const moveSection = (sectionId, direction) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isAdmin) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sections = binderData.sections;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const index = sections.findIndex(s =&gt; s.id === sectionId);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (index === -1) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>let newIndex = index + (direction === 'up' ? -1 : 1);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (newIndex &gt;= 0 &amp;&amp; newIndex &lt; sections.length) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Swap elements</p>
+<p class="p1"><span class="Apple-converted-space">                </span>[sections[index], sections[newIndex]] = [sections[newIndex], sections[index]];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>saveBinderData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- UI RENDERING ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const renderUI = (mode, targetUid) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.loadingSpinner.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.mainUI.classList.remove('hidden');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const selectedSection = binderData.sections.find(s =&gt; s.id === currentSectionId) || binderData.sections[0];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (mode === 'admin' &amp;&amp; isAdmin) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderAdminUI(selectedSection);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Even if not strictly 'public' mode, if isAdmin is false, we render read-only</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderPublicUI(selectedSection);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const renderError = (message) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.loadingSpinner.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.mainUI.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.mainUI.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;strong class="font-bold"&gt;Error!&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span class="block sm:inline"&gt;${message}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const renderAdminUI = (selectedSection) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const publicUrl = `${window.location.origin}${window.location.pathname}?view=public&amp;uid=${userId}`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// --- Left Panel: Section Manager (Table of Contents) ---</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sectionsHTML = binderData.sections.map((section, index) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const isActive = section.id === currentSectionId;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const canMoveUp = index &gt; 0;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const canMoveDown = index &lt; binderData.sections.length - 1;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="section-${section.id}" class="section-item flex items-center justify-between p-3 rounded-lg ${isActive ? 'active-section' : ''} transition duration-150 ease-in-out"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex-grow min-w-0" onclick="handleSectionClick('${section.id}')"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;input type="text" value="${section.title}"<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                </span>onchange="handleTitleChange(event, '${section.id}')"</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>class="bg-transparent font-medium text-gray-800 w-full truncate border-none focus:ring-0 focus:border-blue-500 rounded p-1"</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>placeholder="Section Title"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex space-x-1 ml-2 text-gray-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="moveSection('${section.id}', 'up')" title="Move Up" ${canMoveUp ? '' : 'disabled'} class="p-1 rounded hover:bg-gray-200 disabled:opacity-30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="moveSection('${section.id}', 'down')" title="Move Down" ${canMoveDown ? '' : 'disabled'} class="p-1 rounded hover:bg-gray-200 disabled:opacity-30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="deleteSection('${section.id}')" title="Delete Section" class="p-1 rounded hover:bg-red-200 text-red-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}).join('');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// --- Right Panel: Editor ---</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const editorHTML = selectedSection ? `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-3xl font-bold text-gray-800 mb-4"&gt;${selectedSection.title} (Editing)&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="section-content" class="block text-sm font-medium text-gray-700 mb-2"&gt;Content (Supports Markdown)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;textarea id="section-content" class="w-full h-96 p-4 border border-gray-300 rounded-lg shadow-inner focus:ring-blue-500 focus:border-blue-500"</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>oninput="updatePreview()"&gt;${selectedSection.content}&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 class="text-xl font-semibold text-gray-800 mb-2"&gt;Live Preview:&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="content-preview" class="p-4 bg-white border border-gray-200 rounded-lg min-h-[10rem] prose max-w-none"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>${marked.parse(selectedSection.content)}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onclick="saveContent()" class="w-full py-3 edit-button bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>Save Content</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>` : `&lt;p class="text-center text-gray-500 py-10"&gt;Use the '+ Add Section' button to start building your binder.&lt;/p&gt;`;</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.mainUI.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white p-6 rounded-xl binder-shadow mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h2 class="text-xl font-semibold text-gray-800"&gt;Admin/Editor Mode - User ID: &lt;span class="text-blue-500 font-mono text-sm break-all"&gt;${userId}&lt;/span&gt;&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button onclick="copyPublicLink('${publicUrl}')" class="px-4 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition flex items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"&gt;&lt;path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.881a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>Copy Public Share Link</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p id="share-link-message" class="text-sm text-gray-500 mb-4 break-all"&gt;Shareable Viewer Link: &lt;a href="${publicUrl}" target="_blank" class="text-blue-500 hover:underline"&gt;${publicUrl}&lt;/a&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex flex-col lg:flex-row gap-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;!-- Left Panel: Navigation/TOC --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="lg:w-1/3 bg-white p-6 rounded-xl binder-shadow self-start sticky top-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;h3 class="text-2xl font-semibold text-gray-800"&gt;Sections&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button onclick="addSection()" class="px-3 py-1 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>+ Add Section</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div id="section-list" class="space-y-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>${sectionsHTML}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;!-- Right Panel: Content Editor --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="lg:w-2/3 bg-white p-6 rounded-xl binder-shadow"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>${editorHTML}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Expose utility functions to the window for inline click handlers</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.handleSectionClick = handleSectionClick;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.handleTitleChange = handleTitleChange;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.updatePreview = updatePreview;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.saveContent = saveContent;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.deleteSection = deleteSection;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.addSection = addSection;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.moveSection = moveSection;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.copyPublicLink = copyPublicLink;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const renderPublicUI = (selectedSection) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sectionsHTML = binderData.sections.map(section =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const isActive = section.id === currentSectionId;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return `</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="section-${section.id}" class="section-item p-3 rounded-lg font-medium text-gray-800 ${isActive ? 'active-section' : ''}"</p>
+<p class="p1"><span class="Apple-converted-space">                         </span>onclick="handleSectionClick('${section.id}')"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>${section.title}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}).join('');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const contentHTML = selectedSection ? marked.parse(selectedSection.content) : `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-3xl font-bold text-gray-800 mb-4"&gt;No Content&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-gray-600"&gt;This binder has no sections yet.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.mainUI.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-blue-600 p-6 rounded-t-xl binder-shadow"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h1 class="text-3xl font-bold text-white"&gt;${binderData.binderTitle}&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p class="text-blue-200 mt-1"&gt;Digital Binder Viewer Mode&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex flex-col lg:flex-row gap-8 bg-white p-6 rounded-b-xl binder-shadow"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;!-- Left Panel: Navigation/TOC (Read-Only) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="lg:w-1/4 bg-gray-50 p-4 rounded-lg self-start"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2"&gt;Table of Contents&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div id="section-list" class="space-y-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>${sectionsHTML}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;!-- Right Panel: Content Viewer --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="lg:w-3/4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="prose max-w-none p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>${contentHTML}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Expose utility function for navigation</p>
+<p class="p1"><span class="Apple-converted-space">            </span>window.handleSectionClick = handleSectionClick;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- HANDLERS ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const handleSectionClick = (sectionId) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentSectionId = sectionId;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const params = new URLSearchParams(window.location.search);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const mode = params.get('view') === 'public' ? 'public' : 'admin';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const targetUid = params.get('uid') || userId;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderUI(mode, targetUid);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const handleTitleChange = (event, sectionId) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isAdmin) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const newTitle = event.target.value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sectionIndex = binderData.sections.findIndex(s =&gt; s.id === sectionId);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (sectionIndex !== -1) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>binderData.sections[sectionIndex].title = newTitle || "Untitled Section";</p>
+<p class="p1"><span class="Apple-converted-space">                </span>saveBinderData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const updatePreview = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const content = document.getElementById('section-content').value;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const previewElement = document.getElementById('content-preview');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (previewElement) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Use a safe rendering library like marked.js</p>
+<p class="p1"><span class="Apple-converted-space">                </span>previewElement.innerHTML = marked.parse(content);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const saveContent = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!isAdmin) return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const content = document.getElementById('section-content').value;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (currentSectionId) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// This updates the local data and triggers a save to Firestore</p>
+<p class="p1"><span class="Apple-converted-space">                </span>updateSectionContent(currentSectionId, content);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// A message is not explicitly needed as onSnapshot updates the UI automatically</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const copyPublicLink = (link) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Use the older execCommand for better iFrame compatibility</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const textarea = document.createElement('textarea');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>textarea.value = link;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.body.appendChild(textarea);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>textarea.select();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.execCommand('copy');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>document.body.removeChild(textarea);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>const message = document.getElementById('share-link-message');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>message.innerHTML = `Link copied! &lt;span class="text-green-500 font-semibold"&gt; (Copied!)&lt;/span&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>message.innerHTML = `Shareable Viewer Link: &lt;a href="${link}" target="_blank" class="text-blue-500 hover:underline"&gt;${link}&lt;/a&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}, 2000);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error('Failed to copy text: ', err);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- CUSTOM MODAL IMPLEMENTATION (for alert/confirm) ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let resolveModalPromise;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const showModal = (title, message) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return new Promise((resolve) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>resolveModalPromise = resolve;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.modalTitle.textContent = title;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.modalMessage.textContent = message;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.modal.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>ui.modal.classList.add('flex');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>ui.modalConfirmBtn.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.modal.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.modal.classList.remove('flex');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>resolveModalPromise(true);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>ui.modalCancelBtn.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.modal.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>ui.modal.classList.remove('flex');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>resolveModalPromise(false);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- START APPLICATION ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>initializeFirebase();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
